@@ -1,38 +1,62 @@
-# This is the file where you must work. Write code in the functions, create new functions, 
-# so they work according to the specification
+import csv
+from operator import itemgetter
 
-# Displays the inventory.
 def display_inventory(inventory):
-    pass
+    print("Inventory:\n")
+    v = 0
+    for key,value in inventory.items():
+        print (value,key)
+        v += value
+    print("\nTotal number of items: %g\n" % v)
 
-
-# Adds to the inventory dictionary a list of items from added_items.
 def add_to_inventory(inventory, added_items):
-    pass
+        y = dict((x,added_items.count(x)) for x in added_items)
+        for v,k in y.items():
+            if v in inventory:
+                inventory[v] += k
+        return inventory
 
-
-# Takes your inventory and displays it in a well-organized table with 
-# each column right-justified. The input argument is an order parameter (string)
-# which works as the following:
-# - None (by default) means the table is unordered
-# - "count,desc" means the table is ordered by count (of items in the inventory) 
-#   in descending order
-# - "count,asc" means the table is ordered by count in ascending order
 def print_table(inventory, order=None):
-    pass
+    def print_table_2(inventory,order):
+        if order is None:
+            for key,value in inventory.items():
+                print(str(value).rjust(len(" count")," ")," ",key.rjust(max(len(key) for key in inventory)," "))
+        if order == "count,asc":
+            for key,value in sorted(inventory.items(),key=itemgetter(1)):
+                print(str(value).rjust(len(" count")," ")," ",key.rjust(max(len(key) for key in inventory)," "))
+        if order == "count,desc":
+            for key,value in sorted(inventory.items(),key=itemgetter(1), reverse=True):
+                print(str(value).rjust(len(" count")," ")," ",key.rjust(max(len(key) for key in inventory)," "))
 
+    print("Inventory:\n","count","item name".rjust(18," "))
+    print("-"*25)
+    print_table_2(inventory,order)
+    print("-"*25)
+    print("\nTotal number of items: %d\n" % sum(inventory.values()))
 
-# Imports new inventory items from a file
-# The filename comes as an argument, but by default it's 
-# "import_inventory.csv". The import automatically merges items by name.
-# The file format is plain text with comma separated values (CSV).
 def import_inventory(inventory, filename="import_inventory.csv"):
-    pass
+    my_file = open(filename,'r')
+    for line in my_file:
+        if line.endswith('\n'):
+            line = line[:-1]
+        my_list = line.split(',')
+    my_file.close()
+    for x in my_list:
+        if x in inventory:
+            inventory[x] = inventory.get(x)+1
+        else:
+            inventory[x] = 1
 
-
-# Exports the inventory into a .csv file.
-# if the filename argument is None it creates and overwrites a file
-# called "export_inventory.csv". The file format is the same plain text 
-# with comma separated values (CSV).
 def export_inventory(inventory, filename="export_inventory.csv"):
-    pass
+    export = []
+    for key,value in inventory.items():
+        export.extend([key]*value)
+    with open(filename,'w') as f:
+        writer = csv.writer(f, delimiter=",")
+        writer.writerow(export)
+    f.close()
+    
+   
+inv = {'magic wand':1, 'owl':2, 'galleon':30, 'broomstick':1, 'potion':8, 'book with spells':3}
+dragon_loot = ['book with spells', 'potion', 'broomstick', 'potion', 'owl', 'book with spells', 'potion']
+inv = add_to_inventory(inv,dragon_loot)
